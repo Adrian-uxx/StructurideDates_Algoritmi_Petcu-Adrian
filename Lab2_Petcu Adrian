@@ -1,0 +1,227 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Nodul listei
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// STACK
+typedef struct {
+    Node* top;
+} Stack;
+
+void initStack(Stack* s) {
+    s->top = NULL;
+}
+
+int isEmptyStack(Stack* s) {
+    return s->top == NULL;
+}
+
+void push(Stack* s, int x) {
+    Node* p = (Node*)malloc(sizeof(Node));
+
+    if (p == NULL) {
+        printf("Eroare la alocarea memoriei!\n");
+        return;
+    }
+
+    p->data = x;
+    p->next = s->top;
+    s->top = p;
+}
+
+int pop(Stack* s, int* x) {
+    if (isEmptyStack(s)) {
+        return 0;
+    }
+
+    Node* p = s->top;
+    *x = p->data;
+    s->top = p->next;
+
+    free(p);
+    return 1;
+}
+
+int peek(Stack* s, int* x) {
+    if (isEmptyStack(s)) {
+        return 0;
+    }
+
+    *x = s->top->data;
+    return 1;
+}
+
+void freeStack(Stack* s) {
+    int x;
+    while (pop(s, &x));
+}
+
+// QUEUE
+typedef struct {
+    Node* front;
+    Node* rear;
+} Queue;
+
+void initQueue(Queue* q) {
+    q->front = NULL;
+    q->rear = NULL;
+}
+
+int isEmptyQueue(Queue* q) {
+    return q->front == NULL;
+}
+
+void enqueue(Queue* q, int x) {
+    Node* p = (Node*)malloc(sizeof(Node));
+
+    if (p == NULL) {
+        printf("Eroare la alocarea memoriei!\n");
+        return;
+    }
+
+    p->data = x;
+    p->next = NULL;
+
+    if (isEmptyQueue(q)) {
+        q->front = p;
+        q->rear = p;
+    }
+    else {
+        q->rear->next = p;
+        q->rear = p;
+    }
+}
+
+int dequeue(Queue* q, int* x) {
+    if (isEmptyQueue(q)) {
+        return 0;
+    }
+
+    Node* p = q->front;
+    *x = p->data;
+
+    q->front = p->next;
+
+    if (q->front == NULL) {
+        q->rear = NULL;
+    }
+
+    free(p);
+    return 1;
+}
+
+int front(Queue* q, int* x) {
+    if (isEmptyQueue(q)) {
+        return 0;
+    }
+
+    *x = q->front->data;
+    return 1;
+}
+
+void freeQueue(Queue* q) {
+    int x;
+    while (dequeue(q, &x));
+}
+
+// MAIN
+int main() {
+    Stack s;
+    Queue q;
+    int x;
+
+    initStack(&s);
+    initQueue(&q);
+
+    printf("STACK\n");
+
+    if (isEmptyStack(&s)) {
+        printf("Stack este gol.\n");
+    }
+
+    if (!pop(&s, &x)) {
+        printf("Nu putem elimina dintr-un stack gol.\n");
+    }
+
+    if (!peek(&s, &x)) {
+        printf("Nu putem citi dintr-un stack gol.\n");
+    }
+
+    push(&s, 10);
+
+    if (peek(&s, &x)) {
+        printf("Elementul din varf: %d\n", x);
+    }
+
+    if (pop(&s, &x)) {
+        printf("Element eliminat: %d\n", x);
+    }
+
+    push(&s, 4);
+    push(&s, 7);
+    push(&s, 2);
+
+    printf("Eliminare stack: ");
+
+    while (pop(&s, &x)) {
+        printf("%d ", x);
+    }
+
+    printf("\n");
+
+    push(&s, 99);
+    pop(&s, &x);
+    printf("Adaugat din nou: %d\n", x);
+
+    printf("\nQUEUE\n");
+
+    if (isEmptyQueue(&q)) {
+        printf("Queue este gol.\n");
+    }
+
+    if (!dequeue(&q, &x)) {
+        printf("Nu putem elimina dintr-un queue gol.\n");
+    }
+
+    if (!front(&q, &x)) {
+        printf("Nu putem citi dintr-un queue gol.\n");
+    }
+
+    enqueue(&q, 10);
+
+    if (front(&q, &x)) {
+        printf("Primul element: %d\n", x);
+    }
+
+    if (dequeue(&q, &x)) {
+        printf("Element eliminat: %d\n", x);
+    }
+
+    enqueue(&q, 4);
+    enqueue(&q, 7);
+    enqueue(&q, 2);
+
+    printf("Eliminare queue: ");
+
+    while (dequeue(&q, &x)) {
+        printf("%d ", x);
+    }
+
+    printf("\n");
+
+    enqueue(&q, 99);
+    dequeue(&q, &x);
+    printf("Adaugat din nou: %d\n", x);
+
+    freeStack(&s);
+    freeQueue(&q);
+
+    printf("\nMemoria a fost eliberata.\n");
+
+    return 0;
+}
